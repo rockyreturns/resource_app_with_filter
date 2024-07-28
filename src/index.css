@@ -1,0 +1,50 @@
+body {
+  background-image: url('Background.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.data-grid-custom .MuiDataGrid-columnHeaders {
+  background-color: #0023F5 !important; /* Blue color */
+  color: white;  /*White text */
+  /* height: 32px; Thinner header */
+  font-weight: bold;
+}
+
+.data-grid-custom .MuiDataGrid-columnHeader {
+  padding: 0 8px;
+  background-color: #0023F5 !important;
+}
+
+.data-grid-custom .MuiDataGrid-cell {
+  padding: 0 8px;
+}
+
+.btn-space {
+  margin-right: 5px;
+}
+
+
+/* Customize the DataGrid footer */
+.MuiDataGrid-footerContainer {
+  background-color: white !important;
+  height: 40px !important; /* Adjust height as needed */
+  border-top: 1px solid #e0e0e0; /* Optional: add a border for a cleaner look */
+}
+
+/* Optional: Customize the DataGrid footer content */
+.MuiDataGrid-footerContainer .MuiDataGrid-pagination {
+  font-size: 0.8rem !important; /* Adjust font size as needed */
+}

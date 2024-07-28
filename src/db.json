@@ -1,0 +1,80 @@
+{
+  "savedFilters": [
+    {
+      "filterName": "dev",
+      "subscription": {
+        "value": "01491751-2545-4f64-afa7-54ffc907183d",
+        "label": "R&D-In Silico First eScience-01"
+      },
+      "resourceGroups": [
+        {
+          "value": "bnlwe-es01-d-56839-rg",
+          "label": "bnlwe-es01-d-56839-rg"
+        },
+        {
+          "value": "bnlwe-es01-d-57280-devl-rg",
+          "label": "bnlwe-es01-d-57280-devl-rg"
+        },
+        {
+          "value": "bnlwe-es01-d-55463-PA01-rg",
+          "label": "bnlwe-es01-d-55463-PA01-rg"
+        }
+      ],
+      "id": "3c92"
+    },
+    {
+      "id": "cc80",
+      "filterName": "prod",
+      "subscription": {
+        "value": "01491751-2545-4f64-afa7-54ffc907183d",
+        "label": "R&D-In Silico First eScience-01"
+      },
+      "resourceGroups": [
+        {
+          "value": "bnlwe-es01-p-57036-rg",
+          "label": "bnlwe-es01-p-57036-rg"
+        },
+        {
+          "value": "bnlwe-ES01-p-00000-net-rg",
+          "label": "bnlwe-ES01-p-00000-net-rg"
+        }
+      ]
+    },
+    {
+      "id": "996e",
+      "filterName": "stage",
+      "subscription": {
+        "value": "01491751-2545-4f64-afa7-54ffc907183d",
+        "label": "R&D-In Silico First eScience-01"
+      },
+      "resourceGroups": [
+        {
+          "value": "bnlwe-es01-u-57679-plat-rg",
+          "label": "bnlwe-es01-u-57679-plat-rg"
+        },
+        {
+          "value": "bnlwe-es01-u-57246-PA01-rg",
+          "label": "bnlwe-es01-u-57246-PA01-rg"
+        }
+      ]
+    },
+    {
+      "id": "ee0b",
+      "filterName": "qa",
+      "subscription": {
+        "value": "01491751-2545-4f64-afa7-54ffc907183d",
+        "label": "R&D-In Silico First eScience-01"
+      },
+      "resourceGroups": [
+        {
+          "value": "bnlwe-es01-q-57035-rg",
+          "label": "bnlwe-es01-q-57035-rg"
+        },
+        {
+          "value": "bnlwe-es01-d-57280-devl-rg",
+          "label": "bnlwe-es01-d-57280-devl-rg"
+        }
+      ]
+    }
+  ]
+}
