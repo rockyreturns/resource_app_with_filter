@@ -7,11 +7,12 @@ import { DataGrid } from '@mui/x-data-grid';
 import 'react-datepicker/dist/react-datepicker.css';
 import logoTopLeft from './Unilever-Logo.png';
 import logoBottom from './company-tansparent.png';
-import { FormControlLabel, Switch } from '@mui/material';
+import { Alert, FormControlLabel, Switch } from '@mui/material';
 //import CustomFilterModal from './customFilterModal'; // Import the modal component
 import UniqueFilterModal from './UniqueFilterModal'; // New modal component
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilter } from '@fortawesome/free-solid-svg-icons';
+import { jsx } from '@emotion/react';
 
 const App = () => {
   const [startDate, setStartDate] = useState(null);
@@ -76,19 +77,8 @@ const App = () => {
           // Set resource groups and default options
           setResourceGroups(ResourceGroupsData);
 
+          // Set filter options from the JSON file
           setFilterItems(filterOptions);
-          // setOptions([
-          //   { value: 'select_all', label: 'Select All' }, // Select All first
-          //   ...filterOptions, // Filter names next
-          //   { value: 'select_all', label: 'Select All' } // Placeholder for resource groups
-          // ]);
-
-          // setOptions([
-          //   { value: 'select_all', label: 'Select All' }, // Select All first
-          //   ...filterOptions, // Filter names next
-          //   { value: 'select_all', label: 'Select All' } // Placeholder for resource groups
-          // ]);
-  
   
           // Set date range
           const oldestDate = ResourceGroupsData[0].ResourceGroups[0].OldestResourceinResourceGroup;
@@ -156,7 +146,10 @@ const App = () => {
       // Fetch all filters from your server
       axios.get('http://localhost:3500/savedFilters')
         .then(response => {
-          const filterNames = response.data.map(filter => filter.filterName);
+          const filterNames = response.data.map(filter => filter.filterName);      
+          
+          // Filter out the selected options that are filter names
+          const selectedRgs = selected.filter(option => !filterNames.includes(option.value));
 
           const resourceGroupOptionsFromFilters = selectedFilters.flatMap(filter => {
             const savedFilter = response.data.find(f => f.filterName === filter.value);
@@ -167,7 +160,7 @@ const App = () => {
           });
 
           const uniqueResourceGroupOptions = [...resourceGroupOptionsFromFilters, ...selectedResourceGroups]
-            .filter((option, index, self) => index === self.findIndex(rg => rg.value === option.value));
+            .filter((option, index, self) => index === self.findIndex(rg => rg.value === option.value));     
 
           setSelectedOptions(uniqueResourceGroupOptions);
 
@@ -194,78 +187,139 @@ const App = () => {
         .catch(error => console.error('Error fetching filter data:', error));
     }
   };
-   
+  
+  
+  // Cost and Resource button click.
   const handleCostButtonClick = () => {
     const selectedItems = selectedOptions.map(option => option.value).filter(value => value !== 'select_all').join(',');
     console.log('Selected Items:', selectedItems); // Log selected items
+    var selectedRgForQuery = "";
+    //alert(selectedItems);
 
-    alert(selectedItems);
-    alert(filterItems);
-  
-    setLoading(true);
-  
-    if (showAlternate) {
-      axios.get('https://func-datalab-resource.azurewebsites.net/api/GetResourceCost?code=qD0tXBMsJtmG6BdVHihMXO7v-ADh_gY_LsUb0VJ66ThAAzFuXzcUgw==', {
-        params: {
-          startDate: startDate.toISOString().split('T')[0],
-          endDate: endDate.toISOString().split('T')[0],
-          resourceGroupNames: selectedItems,
-          subscriptionId: selectedSubscription.value
+    //####################################
+    // Logic for fetching the RGs using the unique name.
+
+    // Fetch all filters from your server
+    axios.get('http://localhost:3500/savedFilters')
+    .then(response => {
+
+      //alert(JSON.stringify(response.data))
+      
+      // Get all filter names
+      //const filterNames = response.data.map(filter => filter.filterName);
+      const filterNamesSelected = selectedOptions.filter(option => option.value !== 'select_all').map(option => option.value);
+      
+      // Fetch data for the selected filters
+      const filters = response.data.filter(filter => filterNamesSelected.includes(filter.filterName));
+      if (filters.length > 0) {
+        const selectedRgNames = selectedItems.split(',');
+
+        // Loop through each item in the input array
+        for (let i = 0; i < selectedRgNames.length; i++) {
+          var value = selectedRgNames[i].trim(); // Trim whitespace from the item
+          var found = false;
+          // Check if the item exists in the JSON data
+          for (let j = 0; j < response.data.length; j++) {
+            if (response.data[j].filterName === value) {   
+              alert(response.data[j].filterName);
+              found = true;
+              if(selectedRgForQuery.length > 0)
+              { 
+                selectedRgForQuery = selectedRgForQuery + "," + response.data[j].resourceGroups.map(rgs => rgs.value).join(',');                
+              }     
+              else{
+                selectedRgForQuery = response.data[j].resourceGroups.map(rgs => rgs.value).join(',');  
+              }  
+            }
+          }
+          if(!found)
+          {
+            if(selectedRgForQuery.length > 0)
+            {
+              selectedRgForQuery = selectedRgForQuery + "," + value;              
+            }
+            else {
+              selectedRgForQuery = value;
+            }
+          }
         }
-      })
-      .then(response => {
-        console.log('Cost Data Response:', response.data); // Log the data
-        const formattedData = response.data.map((resourceData, index) => ({
-          id: index,
-          resourceGroupName: resourceData.resourceGroupName,
-          name: resourceData.name,
-          type: resourceData.type,
-          createdTime: resourceData.createdTime,
-          totalCost: resourceData.totalCost,
-          location: resourceData.location,
-          currency: resourceData.currency
-        }));
+
+      } else {
+        selectedRgForQuery = selectedItems;
+      }
+
+      //####################################  Grid Data
+      alert(selectedRgForQuery);
+      setLoading(true);
   
-        setCostGridData(formattedData);
+      if (showAlternate) {
+        axios.get('https://func-datalab-resource.azurewebsites.net/api/GetResourceCost?code=qD0tXBMsJtmG6BdVHihMXO7v-ADh_gY_LsUb0VJ66ThAAzFuXzcUgw==', {
+          params: {
+            startDate: startDate.toISOString().split('T')[0],
+            endDate: endDate.toISOString().split('T')[0],
+            resourceGroupNames: selectedRgForQuery, //selectedItems,
+            subscriptionId: selectedSubscription.value
+          }
+        })
+        .then(response => {
+          console.log('Cost Data Response:', response.data); // Log the data
+          const formattedData = response.data.map((resourceData, index) => ({
+            id: index,
+            resourceGroupName: resourceData.resourceGroupName,
+            name: resourceData.name,
+            type: resourceData.type,
+            createdTime: resourceData.createdTime,
+            totalCost: resourceData.totalCost,
+            location: resourceData.location,
+            currency: resourceData.currency
+          }));
+    
+          setCostGridData(formattedData);
+    
+          const total = response.data.reduce((accumulator, item) => accumulator + item.totalCost, 0);
+          setTotalCost("£ " + total.toFixed(2)); // Ensure total is formatted correctly
+          setLoading(false);
+        })
+        .catch(error => {
+          console.error('Error fetching grid data:', error);
+          setLoading(false);
+        });
+      } else {
+        axios.get('https://func-datalab-resource.azurewebsites.net/api/GetResource?code=qD0tXBMsJtmG6BdVHihMXO7v-ADh_gY_LsUb0VJ66ThAAzFuXzcUgw==', {
+          params: {
+            startDate: startDate.toISOString().split('T')[0],
+            endDate: endDate.toISOString().split('T')[0],
+            resourceGroupNames: selectedRgForQuery, //selectedItems,
+            subscriptionIds: selectedSubscription.value
+          }
+        })
+        .then(response => {
+          console.log('Resource Data Response:', response.data); // Log the data
+          const formattedData = response.data.map((resourceData, index) => ({
+            id: index,
+            resourceGroupName: resourceData.resourceGroupName,
+            name: resourceData.name,
+            type: resourceData.type,
+            createdTime: resourceData.createdTime,
+            location: resourceData.location,
+            resourceId:resourceData.id
+          }));
+    
+          setGridData(formattedData);
+          setTotalCost(formattedData.length);
+          setLoading(false);
+        })
+        .catch(error => {
+          console.error('Error fetching grid data:', error);
+          setLoading(false);
+        });
+      }
+
+      // ################################## Grid Data
+
+    });
   
-        const total = response.data.reduce((accumulator, item) => accumulator + item.totalCost, 0);
-        setTotalCost("£ " + total.toFixed(2)); // Ensure total is formatted correctly
-        setLoading(false);
-      })
-      .catch(error => {
-        console.error('Error fetching grid data:', error);
-        setLoading(false);
-      });
-    } else {
-      axios.get('https://func-datalab-resource.azurewebsites.net/api/GetResource?code=qD0tXBMsJtmG6BdVHihMXO7v-ADh_gY_LsUb0VJ66ThAAzFuXzcUgw==', {
-        params: {
-          startDate: startDate.toISOString().split('T')[0],
-          endDate: endDate.toISOString().split('T')[0],
-          resourceGroupNames: selectedItems,
-          subscriptionIds: selectedSubscription.value
-        }
-      })
-      .then(response => {
-        console.log('Resource Data Response:', response.data); // Log the data
-        const formattedData = response.data.map((resourceData, index) => ({
-          id: index,
-          resourceGroupName: resourceData.resourceGroupName,
-          name: resourceData.name,
-          type: resourceData.type,
-          createdTime: resourceData.createdTime,
-          location: resourceData.location,
-          resourceId:resourceData.id
-        }));
-  
-        setGridData(formattedData);
-        setTotalCost(formattedData.length);
-        setLoading(false);
-      })
-      .catch(error => {
-        console.error('Error fetching grid data:', error);
-        setLoading(false);
-      });
-    }
+
   };
   
   const handleToggleChange = (event) => {
