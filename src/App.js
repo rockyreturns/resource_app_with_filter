@@ -42,21 +42,6 @@ const App = () => {
          setFilterChanged(true); // Trigger polling
   };
 
-  // useEffect(() => {
-  //   if (filterChanged) {
-  //     axios.get('http://localhost:3500/savedFilters')
-  //       .then(response => {
-  //         const filterOptions = response.data.map(filter => ({
-  //           value: filter.filterName,
-  //           label: filter.filterName
-  //         }));
-  //         setOptions(filterOptions);
-  //         setFilterChanged(false); // Reset state after polling
-  //       })
-  //       .catch(error => console.error('Error fetching filter names:', error));
-  //   }
-  // }, [filterChanged]);
-
   useEffect(() => {
     if (effectRan.current === false) {
       const fetchResourceGroups = axios.get('https://func-datalab-resource.azurewebsites.net/api/GetResourceGroups?code=qD0tXBMsJtmG6BdVHihMXO7v-ADh_gY_LsUb0VJ66ThAAzFuXzcUgw==');
@@ -221,7 +206,6 @@ const App = () => {
           // Check if the item exists in the JSON data
           for (let j = 0; j < response.data.length; j++) {
             if (response.data[j].filterName === value) {   
-              alert(response.data[j].filterName);
               found = true;
               if(selectedRgForQuery.length > 0)
               { 
@@ -247,9 +231,7 @@ const App = () => {
       } else {
         selectedRgForQuery = selectedItems;
       }
-
       //####################################  Grid Data
-      alert(selectedRgForQuery);
       setLoading(true);
   
       if (showAlternate) {

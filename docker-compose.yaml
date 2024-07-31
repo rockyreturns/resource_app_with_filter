@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  resourceapp:
+    image: bnlwes904484acr03.azurecr.io/escienceresourceapp:latest
+    ports:
+      - "3000:3000"
+      - "3500:3500"
+    environment:
+      - PORT=3000
+      - JSON_PORT=3500
