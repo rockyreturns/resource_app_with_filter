@@ -23,80 +23,22 @@
       "id": "3c92"
     },
     {
-      "id": "cc80",
-      "filterName": "prod",
+      "filterName": "DataLab-Prod",
       "subscription": {
         "value": "01491751-2545-4f64-afa7-54ffc907183d",
         "label": "R&D-In Silico First eScience-01"
       },
       "resourceGroups": [
         {
-          "value": "bnlwe-es01-p-57036-rg",
-          "label": "bnlwe-es01-p-57036-rg"
+          "value": "bnlwe-es01-p-57278-plat-rg",
+          "label": "bnlwe-es01-p-57278-plat-rg"
         },
         {
-          "value": "bnlwe-ES01-p-00000-net-rg",
-          "label": "bnlwe-ES01-p-00000-net-rg"
+          "value": "MC_bnlwe-es01-p-57278-plat-rg_bnlwe-es01-p-57278-aks-01_westeurope",
+          "label": "MC_bnlwe-es01-p-57278-plat-rg_bnlwe-es01-p-57278-aks-01_westeurope"
         }
-      ]
-    },
-    {
-      "id": "996e",
-      "filterName": "stage",
-      "subscription": {
-        "value": "01491751-2545-4f64-afa7-54ffc907183d",
-        "label": "R&D-In Silico First eScience-01"
-      },
-      "resourceGroups": [
-        {
-          "value": "bnlwe-es01-u-57679-plat-rg",
-          "label": "bnlwe-es01-u-57679-plat-rg"
-        },
-        {
-          "value": "bnlwe-es01-u-57246-PA01-rg",
-          "label": "bnlwe-es01-u-57246-PA01-rg"
-        }
-      ]
-    },
-    {
-      "id": "ee0b",
-      "filterName": "qa",
-      "subscription": {
-        "value": "01491751-2545-4f64-afa7-54ffc907183d",
-        "label": "R&D-In Silico First eScience-01"
-      },
-      "resourceGroups": [
-        {
-          "value": "bnlwe-es01-q-57035-rg",
-          "label": "bnlwe-es01-q-57035-rg"
-        },
-        {
-          "value": "bnlwe-es01-d-57280-devl-rg",
-          "label": "bnlwe-es01-d-57280-devl-rg"
-        }
-      ]
-    },
-    {
-      "id": "e8c6",
-      "filterName": "DataLab-SBX",
-      "subscription": {
-        "value": "01491751-2545-4f64-afa7-54ffc907183d",
-        "label": "R&D-In Silico First eScience-01"
-      },
-      "resourceGroups": [
-        {
-          "value": "bnlwe-es01-s-904484-plat-rg",
-          "label": "bnlwe-es01-s-904484-plat-rg"
-        },
-        {
-          "value": "MC_bnlwe-es01-s-904484-plat-rg_bnlwe-es01-s-904484-aks-01_westeurope",
-          "label": "MC_bnlwe-es01-s-904484-plat-rg_bnlwe-es01-s-904484-aks-01_westeurope"
-        },
-        {
-          "value": "databricks-rg-bnlwe-es01-s-904484-plat-rg",
-          "label": "databricks-rg-bnlwe-es01-s-904484-plat-rg"
-        }
-      ]
+      ],
+      "id": "F47YxnB"
     }
   ]
 }

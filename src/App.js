@@ -45,7 +45,7 @@ const App = () => {
   useEffect(() => {
     if (effectRan.current === false) {
       const fetchResourceGroups = axios.get('https://func-datalab-resource.azurewebsites.net/api/GetResourceGroups?code=qD0tXBMsJtmG6BdVHihMXO7v-ADh_gY_LsUb0VJ66ThAAzFuXzcUgw==');
-      const fetchFilterNames = axios.get('/api/savedFilters');
+      const fetchFilterNames = axios.get('/savedFilters');
  
       Promise.all([fetchResourceGroups, fetchFilterNames])
         .then(([resourceGroupsResponse, filtersResponse]) => {
@@ -54,7 +54,8 @@ const App = () => {
             value: filter.filterName,
             label: filter.filterName
           }));
-  
+
+          //alert(filtersResponse);
 
           // Set subscription options
           setSubscription(ResourceGroupsData.map(subs => ({ value: subs.SubscriptionId, label: subs.DisplayName })));
@@ -95,7 +96,7 @@ const App = () => {
         }));
         
         // Fetch and map filter options
-        axios.get('/api/savedFilters')
+        axios.get('/savedFilters')
           .then(response => {
             const filterOptions = response.data
               .filter(filter => filter.subscription.value === subscriptionValue)
@@ -129,7 +130,7 @@ const App = () => {
       const selectedResourceGroups = selected.filter(option => !option.value.startsWith('filter_'));
 
       // Fetch all filters from your server
-      axios.get('/api/savedFilters')
+      axios.get('/savedFilters')
         .then(response => {
           const filterNames = response.data.map(filter => filter.filterName);      
           
@@ -185,7 +186,7 @@ const App = () => {
     // Logic for fetching the RGs using the unique name.
 
     // Fetch all filters from your server
-    axios.get('/api/savedFilters')
+    axios.get('/savedFilters')
     .then(response => {
 
       //alert(JSON.stringify(response.data))
