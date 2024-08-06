@@ -15,11 +15,11 @@ COPY . .
 RUN npm run build
 
 # Copy entrypoint script
-COPY entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/entrypoint.sh
+# COPY entrypoint.sh /usr/local/bin/
+# RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Expose port 3000
 EXPOSE 3000
 
 # Start the app
-ENTRYPOINT ["entrypoint.sh"]
+CMD ["npm", "start"]
