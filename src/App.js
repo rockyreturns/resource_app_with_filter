@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.css';
+import AlertMessage from './AlertMessage';
 import DatePicker from 'react-datepicker';
 import Select from 'react-select';
 import { DataGrid } from '@mui/x-data-grid';
@@ -15,6 +16,7 @@ import { faFilter } from '@fortawesome/free-solid-svg-icons';
 import { jsx } from '@emotion/react';
 
 const App = () => {
+  const [alertInfo, setAlertInfo] = useState({ show: false, message: '' });
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [options, setOptions] = useState([]);
@@ -177,6 +179,22 @@ const App = () => {
   
   // Cost and Resource button click.
   const handleCostButtonClick = () => {
+
+    if (selectedSubscription.length === 0) {
+      setAlertInfo({ show: true, message: 'Please select a subscription.', variant: 'danger' });
+      return;
+    }
+
+    if (selectedOptions.length === 0) {
+      setAlertInfo({ show: true, message: 'Please select at least one resource group.', variant: 'danger' });
+      return;
+    }
+
+    if (endDate < startDate) {
+      setAlertInfo({ show: true, message: 'End date cannot be earlier than start date.', variant: 'danger' });
+      return;
+    }
+
     const selectedItems = selectedOptions.map(option => option.value).filter(value => value !== 'select_all').join(',');
     console.log('Selected Items:', selectedItems); // Log selected items
     var selectedRgForQuery = "";
@@ -324,6 +342,9 @@ const App = () => {
     setRefreshKey(prevKey => prevKey + 1); 
   };
 
+  const handleCloseAlert = () => {
+    setAlertInfo({ ...alertInfo, show: false });
+  };
   
  const costColumns = [
     { field: 'resourceGroupName', headerName: 'RG Name', width: 250 },
@@ -351,6 +372,14 @@ const App = () => {
 
   return (
    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', padding: '10px', overflow: 'hidden' }}>
+
+      <AlertMessage
+        show={alertInfo.show}
+        message={alertInfo.message}
+        onClose={handleCloseAlert}
+      />
+
+
       <img src={logoTopLeft} alt="Logo" style={{ position: 'absolute', top: '10px', left: '10px', width: '60px', height: 'auto', zIndex: '100' }} />
       <div className="row text-center my-2" style={{ color: "royalblue" }}>
         <h4>e-Science Resource Data</h4>
