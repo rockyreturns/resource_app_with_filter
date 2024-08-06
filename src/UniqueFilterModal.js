@@ -33,7 +33,7 @@ const UniqueFilterModal = ({ show, onHide, startDate, endDate, ResourceGroupsDat
   }, [show, ResourceGroupsData]);
 
   useEffect(() => {
-    axios.get('/savedFilters')
+    axios.get('https://jsonserverapp-a3a9dzheexfpgfab.westeurope-01.azurewebsites.net/savedFilters')
       .then(response => {
         setSavedFilters(response.data);
       })
@@ -43,7 +43,7 @@ const UniqueFilterModal = ({ show, onHide, startDate, endDate, ResourceGroupsDat
   }, []);
 
   const saveFilterToServer = (filterData) => {
-    axios.post('/savedFilters', filterData)
+    axios.post('https://jsonserverapp-a3a9dzheexfpgfab.westeurope-01.azurewebsites.net/savedFilters', filterData)
       .then(response => {
         setSavedFilters([...savedFilters, response.data]);
         console.log('Filter saved successfully:', response.data);
@@ -54,7 +54,7 @@ const UniqueFilterModal = ({ show, onHide, startDate, endDate, ResourceGroupsDat
   };
 
   const updateFilterOnServer = (filterData) => {
-    axios.put(`/savedFilters/${editingFilterId}`, filterData)
+    axios.put(`https://jsonserverapp-a3a9dzheexfpgfab.westeurope-01.azurewebsites.net/savedFilters/${editingFilterId}`, filterData)
       .then(response => {
         const updatedFilters = savedFilters.map(filter => 
           filter.id === editingFilterId ? response.data : filter
@@ -129,7 +129,7 @@ const UniqueFilterModal = ({ show, onHide, startDate, endDate, ResourceGroupsDat
   };
 
   const handleRemoveFilter = (id) => {
-    axios.delete(`/savedFilters/${id}`)
+    axios.delete(`https://jsonserverapp-a3a9dzheexfpgfab.westeurope-01.azurewebsites.net/savedFilters/${id}`)
       .then(() => {
         const updatedFilters = savedFilters.filter(filter => filter.id !== id);
         setSavedFilters(updatedFilters);
