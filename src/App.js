@@ -236,7 +236,7 @@ const App = () => {
       setLoading(true);
   
       if (showAlternate) {
-        axios.get('https://func-datalab-resource.azurewebsites.net/api/GetResourceCost?code=qD0tXBMsJtmG6BdVHihMXO7v-ADh_gY_LsUb0VJ66ThAAzFuXzcUgw==', {
+        axios.get('https://func-datalab-resource.azurewebsites.net/api/GetCostTest?code=qD0tXBMsJtmG6BdVHihMXO7v-ADh_gY_LsUb0VJ66ThAAzFuXzcUgw==', {
           params: {
             startDate: startDate.toISOString().split('T')[0],
             endDate: endDate.toISOString().split('T')[0],
@@ -268,12 +268,12 @@ const App = () => {
           setLoading(false);
         });
       } else {
-        axios.get('https://func-datalab-resource.azurewebsites.net/api/GetResource?code=qD0tXBMsJtmG6BdVHihMXO7v-ADh_gY_LsUb0VJ66ThAAzFuXzcUgw==', {
+        axios.get('https://func-datalab-resource.azurewebsites.net/api/ResourceAndResourceCost?code=qD0tXBMsJtmG6BdVHihMXO7v-ADh_gY_LsUb0VJ66ThAAzFuXzcUgw==', {
           params: {
             startDate: startDate.toISOString().split('T')[0],
             endDate: endDate.toISOString().split('T')[0],
             resourceGroupNames: selectedRgForQuery, //selectedItems,
-            subscriptionIds: selectedSubscription.value
+            subscriptionId: selectedSubscription.value
           }
         })
         .then(response => {
@@ -284,12 +284,15 @@ const App = () => {
             name: resourceData.name,
             type: resourceData.type,
             createdTime: resourceData.createdTime,
+            totalCost: resourceData.totalCost,
             location: resourceData.location,
             resourceId:resourceData.id
           }));
     
           setGridData(formattedData);
-          setTotalCost(formattedData.length);
+          //setTotalCost(formattedData.length);
+          const total = response.data.reduce((accumulator, item) => accumulator + item.totalCost, 0);
+          setTotalCost("£ " + total.toFixed(2)); // Ensure total is formatted correctly
           setLoading(false);
         })
         .catch(error => {
@@ -337,6 +340,7 @@ const App = () => {
     { field: 'type', headerName: 'Service Type', width: 300 },
     { field: 'location', headerName: 'Location', width: 200 },
     { field: 'createdTime', headerName: 'Created Time', width: 250 },
+    { field: 'totalCost', headerName: 'Cost', width: 250 },
     { field: 'resourceId', headerName: 'Resource Id', width: 500 }
   ];
   const buttonStyle = {
