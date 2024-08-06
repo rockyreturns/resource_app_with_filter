@@ -45,17 +45,17 @@ const App = () => {
   useEffect(() => {
     if (effectRan.current === false) {
       const fetchResourceGroups = axios.get('https://func-datalab-resource.azurewebsites.net/api/GetResourceGroups?code=qD0tXBMsJtmG6BdVHihMXO7v-ADh_gY_LsUb0VJ66ThAAzFuXzcUgw==');
-      const fetchFilterNames = axios.get('https://jsonserverapp-a3a9dzheexfpgfab.westeurope-01.azurewebsites.net/savedFilters');
+      const fetchFilterNames = axios.get('/savedFilters');
  
-      //alert(fetchFilterNames);
-
       Promise.all([fetchResourceGroups, fetchFilterNames])
         .then(([resourceGroupsResponse, filtersResponse]) => {
           const ResourceGroupsData = resourceGroupsResponse.data;
           const filterOptions = filtersResponse.data.map(filter => ({
             value: filter.filterName,
             label: filter.filterName
-          }));          
+          }));
+
+          //alert(filtersResponse);
 
           // Set subscription options
           setSubscription(ResourceGroupsData.map(subs => ({ value: subs.SubscriptionId, label: subs.DisplayName })));
@@ -96,7 +96,7 @@ const App = () => {
         }));
         
         // Fetch and map filter options
-        axios.get('https://jsonserverapp-a3a9dzheexfpgfab.westeurope-01.azurewebsites.net/savedFilters')
+        axios.get('/savedFilters')
           .then(response => {
             const filterOptions = response.data
               .filter(filter => filter.subscription.value === subscriptionValue)
@@ -130,7 +130,7 @@ const App = () => {
       const selectedResourceGroups = selected.filter(option => !option.value.startsWith('filter_'));
 
       // Fetch all filters from your server
-      axios.get('https://jsonserverapp-a3a9dzheexfpgfab.westeurope-01.azurewebsites.net/savedFilters')
+      axios.get('/savedFilters')
         .then(response => {
           const filterNames = response.data.map(filter => filter.filterName);      
           
@@ -186,7 +186,7 @@ const App = () => {
     // Logic for fetching the RGs using the unique name.
 
     // Fetch all filters from your server
-    axios.get('https://jsonserverapp-a3a9dzheexfpgfab.westeurope-01.azurewebsites.net/savedFilters')
+    axios.get('/savedFilters')
     .then(response => {
 
       //alert(JSON.stringify(response.data))
