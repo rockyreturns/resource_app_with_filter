@@ -11,7 +11,7 @@ app.use(cors());
 
 // Proxy requests to /api to the JSON server
 app.use('/api', createProxyMiddleware({
-  target: 'http://localhost:3500',
+  target: 'https://jsonserverapp-a3a9dzheexfpgfab.westeurope-01.azurewebsites.net',
   changeOrigin: true,
   pathRewrite: {
     '^/api': '' // Remove '/api' from the request URL

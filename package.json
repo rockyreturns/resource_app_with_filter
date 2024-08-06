@@ -54,5 +54,5 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:3500/"
+  "proxy": "https://jsonserverapp-a3a9dzheexfpgfab.westeurope-01.azurewebsites.net/"
 }

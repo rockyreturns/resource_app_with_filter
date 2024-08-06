@@ -33,7 +33,7 @@ const UniqueFilterModal = ({ show, onHide, startDate, endDate, ResourceGroupsDat
   }, [show, ResourceGroupsData]);
 
   useEffect(() => {
-    axios.get('http://localhost:3500/savedFilters')
+    axios.get('/savedFilters')
       .then(response => {
         setSavedFilters(response.data);
       })
@@ -43,7 +43,7 @@ const UniqueFilterModal = ({ show, onHide, startDate, endDate, ResourceGroupsDat
   }, []);
 
   const saveFilterToServer = (filterData) => {
-    axios.post('http://localhost:3500/savedFilters', filterData)
+    axios.post('/savedFilters', filterData)
       .then(response => {
         setSavedFilters([...savedFilters, response.data]);
         console.log('Filter saved successfully:', response.data);
@@ -54,7 +54,7 @@ const UniqueFilterModal = ({ show, onHide, startDate, endDate, ResourceGroupsDat
   };
 
   const updateFilterOnServer = (filterData) => {
-    axios.put(`http://localhost:3500/savedFilters/${editingFilterId}`, filterData)
+    axios.put(`/savedFilters/${editingFilterId}`, filterData)
       .then(response => {
         const updatedFilters = savedFilters.map(filter => 
           filter.id === editingFilterId ? response.data : filter
@@ -129,7 +129,7 @@ const UniqueFilterModal = ({ show, onHide, startDate, endDate, ResourceGroupsDat
   };
 
   const handleRemoveFilter = (id) => {
-    axios.delete(`http://localhost:3500/savedFilters/${id}`)
+    axios.delete(`/savedFilters/${id}`)
       .then(() => {
         const updatedFilters = savedFilters.filter(filter => filter.id !== id);
         setSavedFilters(updatedFilters);
