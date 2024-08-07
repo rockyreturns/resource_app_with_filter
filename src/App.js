@@ -254,7 +254,7 @@ const App = () => {
       setLoading(true);
   
       if (showAlternate) {
-        axios.get('https://func-datalab-resource.azurewebsites.net/api/GetCostTest?code=qD0tXBMsJtmG6BdVHihMXO7v-ADh_gY_LsUb0VJ66ThAAzFuXzcUgw==', {
+        axios.get('https://func-datalab-resource.azurewebsites.net/api/GetResourceCost?code=qD0tXBMsJtmG6BdVHihMXO7v-ADh_gY_LsUb0VJ66ThAAzFuXzcUgw==', {
           params: {
             startDate: startDate.toISOString().split('T')[0],
             endDate: endDate.toISOString().split('T')[0],
