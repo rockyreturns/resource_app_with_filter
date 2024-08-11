@@ -34,6 +34,7 @@ const App = () => {
   const [filterChanged, setFilterChanged] = useState(false);
   const [subscriptionValue, setSubscriptionValue]= useState([]);
   const [filterItems, setFilterItems] = useState({});
+  const [resourceData, setResourceData] = useState({});
   const effectRan = useRef(false);  
 
   const handleSaveFilter = (newFilter) => {
@@ -254,7 +255,7 @@ const App = () => {
       setLoading(true);
   
       if (showAlternate) {
-        axios.get('https://func-datalab-resource.azurewebsites.net/api/GetResourceCost?code=qD0tXBMsJtmG6BdVHihMXO7v-ADh_gY_LsUb0VJ66ThAAzFuXzcUgw==', {
+        axios.get('https://func-datalab-resource.azurewebsites.net/api/GetCostDataWithRetry?code=qD0tXBMsJtmG6BdVHihMXO7v-ADh_gY_LsUb0VJ66ThAAzFuXzcUgw==', {
           params: {
             startDate: startDate.toISOString().split('T')[0],
             endDate: endDate.toISOString().split('T')[0],
@@ -264,6 +265,7 @@ const App = () => {
         })
         .then(response => {
           console.log('Cost Data Response:', response.data); // Log the data
+
           const formattedData = response.data.map((resourceData, index) => ({
             id: index,
             resourceGroupName: resourceData.resourceGroupName,
@@ -272,21 +274,23 @@ const App = () => {
             createdTime: resourceData.createdTime,
             totalCost: resourceData.totalCost,
             location: resourceData.location,
-            currency: resourceData.currency
+            currency: resourceData.currency 
           }));
     
           setCostGridData(formattedData);
     
+          //const total = response.data.reduce((total, item) => total + parseFloat(item.cost), 0).toFixed(4);
           const total = response.data.reduce((accumulator, item) => accumulator + item.totalCost, 0);
           setTotalCost("£ " + total.toFixed(2)); // Ensure total is formatted correctly
           setLoading(false);
         })
         .catch(error => {
+          setAlertInfo({ show: true, message: 'Failed to retrieve data for ' + selectedItems + '. Please retry after some time.', variant: 'danger' });
           console.error('Error fetching grid data:', error);
           setLoading(false);
         });
       } else {
-        axios.get('https://func-datalab-resource.azurewebsites.net/api/ResourceAndResourceCost?code=qD0tXBMsJtmG6BdVHihMXO7v-ADh_gY_LsUb0VJ66ThAAzFuXzcUgw==', {
+        axios.get('https://func-datalab-resource.azurewebsites.net/api/GetResourceAndResourceCostWithRetry?code=qD0tXBMsJtmG6BdVHihMXO7v-ADh_gY_LsUb0VJ66ThAAzFuXzcUgw==', {
           params: {
             startDate: startDate.toISOString().split('T')[0],
             endDate: endDate.toISOString().split('T')[0],
@@ -308,21 +312,18 @@ const App = () => {
           }));
     
           setGridData(formattedData);
-          //setTotalCost(formattedData.length);
           const total = response.data.reduce((accumulator, item) => accumulator + item.totalCost, 0);
           setTotalCost("£ " + total.toFixed(2)); // Ensure total is formatted correctly
           setLoading(false);
         })
         .catch(error => {
+          setAlertInfo({ show: true, message: 'Failed to retrieve data for ' + selectedItems + '. Please retry after some time.', variant: 'danger' });
           console.error('Error fetching grid data:', error);
           setLoading(false);
         });
       }
 
-      // ################################## Grid Data
-
-    });
-  
+    });  
 
   };
   
@@ -434,9 +435,7 @@ const App = () => {
 
 
      <div className="row bg-light align-items-end" style={{ padding: '5px', borderRadius: '4px' }}>
-            <div className="col-8 col-md-8">
-                {/* ##################### */}
-                    
+            <div className="col-8 col-md-8">                 
                 <div className="row">  
                   <div className="col-2 col-md-4">   
                         <label htmlFor="selectSubs"><h6>Select Subscription:</h6></label>
@@ -456,9 +455,6 @@ const App = () => {
                           />
                   </div>
                 </div>
-
-                {/* ##################### */}
-
           <div className="row">
             <div className="col-2 col-md-2">
               <label htmlFor="selectItems"><h6>Select Items:</h6></label>

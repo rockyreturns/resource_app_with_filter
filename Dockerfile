@@ -1,5 +1,5 @@
 # Use the official Node.js image
-FROM node:14
+FROM node:18
 
 # Set working directory
 WORKDIR /app
@@ -22,4 +22,4 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 EXPOSE 3000
 
 # Start the app
-ENTRYPOINT ["entrypoint.sh"]
+ENTRYPOINT ["npm", "start"]
