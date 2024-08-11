@@ -272,7 +272,7 @@ const App = () => {
             name: resourceData.name,
             type: resourceData.type,
             createdTime: resourceData.createdTime,
-            totalCost: resourceData.totalCost,
+            totalCost: parseFloat(resourceData.totalCost),
             location: resourceData.location,
             currency: resourceData.currency 
           }));
@@ -280,7 +280,7 @@ const App = () => {
           setCostGridData(formattedData);
     
           //const total = response.data.reduce((total, item) => total + parseFloat(item.cost), 0).toFixed(4);
-          const total = response.data.reduce((accumulator, item) => accumulator + item.totalCost, 0);
+          const total = response.data.reduce((accumulator, item) => accumulator + parseFloat(item.totalCost), 0);
           setTotalCost("£ " + total.toFixed(2)); // Ensure total is formatted correctly
           setLoading(false);
         })
@@ -306,13 +306,13 @@ const App = () => {
             name: resourceData.name,
             type: resourceData.type,
             createdTime: resourceData.createdTime,
-            totalCost: resourceData.totalCost,
+            totalCost: parseFloat(resourceData.totalCost),
             location: resourceData.location,
             resourceId:resourceData.id
           }));
     
           setGridData(formattedData);
-          const total = response.data.reduce((accumulator, item) => accumulator + item.totalCost, 0);
+          const total = response.data.reduce((accumulator, item) => accumulator + parseFloat(item.totalCost), 0);
           setTotalCost("£ " + total.toFixed(2)); // Ensure total is formatted correctly
           setLoading(false);
         })
