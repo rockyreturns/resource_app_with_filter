@@ -32,24 +32,24 @@ const App = () => {
   const [uniqueModalShow, setUniqueModalShow] = useState(false); // State for UniqueFilterModal
   const [refreshKey, setRefreshKey] = useState(0);
   const [filterChanged, setFilterChanged] = useState(false);
-  const [subscriptionValue, setSubscriptionValue]= useState([]);
+  const [subscriptionValue, setSubscriptionValue] = useState([]);
   const [filterItems, setFilterItems] = useState({});
   const [resourceData, setResourceData] = useState({});
-  const effectRan = useRef(false);  
+  const effectRan = useRef(false);
 
   const handleSaveFilter = (newFilter) => {
-        setFilterChanged(true); // Trigger polling    
+    setFilterChanged(true); // Trigger polling    
   };
 
   const handleDeleteFilter = (filterName) => {
-         setFilterChanged(true); // Trigger polling
+    setFilterChanged(true); // Trigger polling
   };
 
   useEffect(() => {
     if (effectRan.current === false) {
       const fetchResourceGroups = axios.get('https://func-datalab-resource.azurewebsites.net/api/GetResourceGroups?code=qD0tXBMsJtmG6BdVHihMXO7v-ADh_gY_LsUb0VJ66ThAAzFuXzcUgw==');
       const fetchFilterNames = axios.get('https://jsonserverapp-a3a9dzheexfpgfab.westeurope-01.azurewebsites.net/savedFilters');
- 
+
       Promise.all([fetchResourceGroups, fetchFilterNames])
         .then(([resourceGroupsResponse, filtersResponse]) => {
           const ResourceGroupsData = resourceGroupsResponse.data;
@@ -62,13 +62,13 @@ const App = () => {
 
           // Set subscription options
           setSubscription(ResourceGroupsData.map(subs => ({ value: subs.SubscriptionId, label: subs.DisplayName })));
-  
+
           // Set resource groups and default options
           setResourceGroups(ResourceGroupsData);
 
           // Set filter options from the JSON file
           setFilterItems(filterOptions);
-  
+
           // Set date range
           const oldestDate = ResourceGroupsData[0].ResourceGroups[0].OldestResourceinResourceGroup;
           const newestDate = ResourceGroupsData[0].ResourceGroups[0].NewestResourceinResourceGroup;
@@ -81,23 +81,23 @@ const App = () => {
       effectRan.current = true; // Cleanup
     };
   }, []);
-  
-  
+
+
   const handleSubscriptonSelectChange = (selected) => {
-    if (selected) {      
+    if (selected) {
       setSelectedSubscription(selected);
       const subscriptionValue = selected.value;
-      
+
       // Find resource groups for the selected subscription
       const subscriptionData = resourceGroups.find(rg => rg.SubscriptionId === subscriptionValue);
-      
+
       if (subscriptionData) {
         // Map resource groups for the selected subscription
         const resourceGroupOptions = subscriptionData.ResourceGroups.map(rg => ({
           value: rg.Name, // Use the correct field name
           label: rg.Name  // Use the correct field name
         }));
-        
+
         // Fetch and map filter options
         axios.get('https://jsonserverapp-a3a9dzheexfpgfab.westeurope-01.azurewebsites.net/savedFilters')
           .then(response => {
@@ -107,19 +107,19 @@ const App = () => {
                 value: filter.filterName,
                 label: filter.filterName
               }));
-            
+
             // Merge filter options and resource group options
             setOptions([
               //{ value: 'select_all', label: 'Select All' }, // Select All first
-            ...filterOptions,  // Filter names
-            ...resourceGroupOptions // Resource groups next
+              ...filterOptions,  // Filter names
+              ...resourceGroupOptions // Resource groups next
             ]);
           })
-          .catch(error => console.error('Error fetching filter names:', error));      
+          .catch(error => console.error('Error fetching filter names:', error));
       }
-    } 
+    }
   };
-  
+
   const handleSelectChange = (selected) => {
     if (selected && selected.some(option => option.value === 'select_all')) {
       if (selected.length === options.length) {
@@ -135,8 +135,8 @@ const App = () => {
       // Fetch all filters from your server
       axios.get('https://jsonserverapp-a3a9dzheexfpgfab.westeurope-01.azurewebsites.net/savedFilters')
         .then(response => {
-          const filterNames = response.data.map(filter => filter.filterName);      
-          
+          const filterNames = response.data.map(filter => filter.filterName);
+
           // Filter out the selected options that are filter names
           const selectedRgs = selected.filter(option => !filterNames.includes(option.value));
 
@@ -149,7 +149,7 @@ const App = () => {
           });
 
           const uniqueResourceGroupOptions = [...resourceGroupOptionsFromFilters, ...selectedResourceGroups]
-            .filter((option, index, self) => index === self.findIndex(rg => rg.value === option.value));     
+            .filter((option, index, self) => index === self.findIndex(rg => rg.value === option.value));
 
           setSelectedOptions(uniqueResourceGroupOptions);
 
@@ -176,8 +176,8 @@ const App = () => {
         .catch(error => console.error('Error fetching filter data:', error));
     }
   };
-  
-  
+
+
   // Cost and Resource button click.
   const handleCostButtonClick = () => {
 
@@ -206,127 +206,124 @@ const App = () => {
 
     // Fetch all filters from your server
     axios.get('https://jsonserverapp-a3a9dzheexfpgfab.westeurope-01.azurewebsites.net/savedFilters')
-    .then(response => {
+      .then(response => {
 
-      //alert(JSON.stringify(response.data))
-      
-      // Get all filter names
-      //const filterNames = response.data.map(filter => filter.filterName);
-      const filterNamesSelected = selectedOptions.filter(option => option.value !== 'select_all').map(option => option.value);
-      
-      // Fetch data for the selected filters
-      const filters = response.data.filter(filter => filterNamesSelected.includes(filter.filterName));
-      if (filters.length > 0) {
-        const selectedRgNames = selectedItems.split(',');
+        //alert(JSON.stringify(response.data))
 
-        // Loop through each item in the input array
-        for (let i = 0; i < selectedRgNames.length; i++) {
-          var value = selectedRgNames[i].trim(); // Trim whitespace from the item
-          var found = false;
-          // Check if the item exists in the JSON data
-          for (let j = 0; j < response.data.length; j++) {
-            if (response.data[j].filterName === value) {   
-              found = true;
-              if(selectedRgForQuery.length > 0)
-              { 
-                selectedRgForQuery = selectedRgForQuery + "," + response.data[j].resourceGroups.map(rgs => rgs.value).join(',');                
-              }     
-              else{
-                selectedRgForQuery = response.data[j].resourceGroups.map(rgs => rgs.value).join(',');  
-              }  
+        // Get all filter names
+        //const filterNames = response.data.map(filter => filter.filterName);
+        const filterNamesSelected = selectedOptions.filter(option => option.value !== 'select_all').map(option => option.value);
+
+        // Fetch data for the selected filters
+        const filters = response.data.filter(filter => filterNamesSelected.includes(filter.filterName));
+        if (filters.length > 0) {
+          const selectedRgNames = selectedItems.split(',');
+
+          // Loop through each item in the input array
+          for (let i = 0; i < selectedRgNames.length; i++) {
+            var value = selectedRgNames[i].trim(); // Trim whitespace from the item
+            var found = false;
+            // Check if the item exists in the JSON data
+            for (let j = 0; j < response.data.length; j++) {
+              if (response.data[j].filterName === value) {
+                found = true;
+                if (selectedRgForQuery.length > 0) {
+                  selectedRgForQuery = selectedRgForQuery + "," + response.data[j].resourceGroups.map(rgs => rgs.value).join(',');
+                }
+                else {
+                  selectedRgForQuery = response.data[j].resourceGroups.map(rgs => rgs.value).join(',');
+                }
+              }
+            }
+            if (!found) {
+              if (selectedRgForQuery.length > 0) {
+                selectedRgForQuery = selectedRgForQuery + "," + value;
+              }
+              else {
+                selectedRgForQuery = value;
+              }
             }
           }
-          if(!found)
-          {
-            if(selectedRgForQuery.length > 0)
-            {
-              selectedRgForQuery = selectedRgForQuery + "," + value;              
+
+        } else {
+          selectedRgForQuery = selectedItems;
+        }
+        //####################################  Grid Data
+        setLoading(true);
+
+        if (showAlternate) {
+          axios.get('https://func-datalab-resource.azurewebsites.net/api/GetCostDataWithRetry?code=qD0tXBMsJtmG6BdVHihMXO7v-ADh_gY_LsUb0VJ66ThAAzFuXzcUgw==', {
+            params: {
+              startDate: startDate.toISOString().split('T')[0],
+              endDate: endDate.toISOString().split('T')[0],
+              resourceGroupNames: selectedRgForQuery, //selectedItems,
+              subscriptionId: selectedSubscription.value
             }
-            else {
-              selectedRgForQuery = value;
+          })
+            .then(response => {
+              console.log('Cost Data Response:', response.data); // Log the data
+
+              const formattedData = response.data.map((resourceData, index) => ({
+                id: index,
+                resourceGroupName: resourceData.resourceGroupName,
+                name: resourceData.name,
+                type: resourceData.type,
+                createdTime: resourceData.createdTime,
+                totalCost: parseFloat(resourceData.totalCost),
+                location: resourceData.location,
+                currency: resourceData.currency
+              }));
+
+              setCostGridData(formattedData);
+
+              //const total = response.data.reduce((total, item) => total + parseFloat(item.cost), 0).toFixed(4);
+              const total = response.data.reduce((accumulator, item) => accumulator + parseFloat(item.totalCost), 0);
+              setTotalCost("£ " + total.toFixed(2)); // Ensure total is formatted correctly
+              setLoading(false);
+            })
+            .catch(error => {
+              setAlertInfo({ show: true, message: 'Failed to retrieve data for ' + selectedItems + '. Please retry after some time.', variant: 'danger' });
+              console.error('Error fetching grid data:', error);
+              setLoading(false);
+            });
+        } else {
+          axios.get('https://func-datalab-resource.azurewebsites.net/api/GetResourceAndResourceCostWithRetry?code=qD0tXBMsJtmG6BdVHihMXO7v-ADh_gY_LsUb0VJ66ThAAzFuXzcUgw==', {
+            params: {
+              startDate: startDate.toISOString().split('T')[0],
+              endDate: endDate.toISOString().split('T')[0],
+              resourceGroupNames: selectedRgForQuery, //selectedItems,
+              subscriptionId: selectedSubscription.value
             }
-          }
+          })
+            .then(response => {
+              console.log('Resource Data Response:', response.data); // Log the data
+              const formattedData = response.data.map((resourceData, index) => ({
+                id: index,
+                resourceGroupName: resourceData.resourceGroupName,
+                name: resourceData.name,
+                type: resourceData.type,
+                createdTime: resourceData.createdTime,
+                totalCost: parseFloat(resourceData.totalCost),
+                location: resourceData.location,
+                resourceId: resourceData.id
+              }));
+
+              setGridData(formattedData);
+              const total = response.data.reduce((accumulator, item) => accumulator + parseFloat(item.totalCost), 0);
+              setTotalCost("£ " + total.toFixed(2)); // Ensure total is formatted correctly
+              setLoading(false);
+            })
+            .catch(error => {
+              setAlertInfo({ show: true, message: 'Failed to retrieve data for ' + selectedItems + '. Please retry after some time.', variant: 'danger' });
+              console.error('Error fetching grid data:', error);
+              setLoading(false);
+            });
         }
 
-      } else {
-        selectedRgForQuery = selectedItems;
-      }
-      //####################################  Grid Data
-      setLoading(true);
-  
-      if (showAlternate) {
-        axios.get('https://func-datalab-resource.azurewebsites.net/api/GetCostDataWithRetry?code=qD0tXBMsJtmG6BdVHihMXO7v-ADh_gY_LsUb0VJ66ThAAzFuXzcUgw==', {
-          params: {
-            startDate: startDate.toISOString().split('T')[0],
-            endDate: endDate.toISOString().split('T')[0],
-            resourceGroupNames: selectedRgForQuery, //selectedItems,
-            subscriptionId: selectedSubscription.value
-          }
-        })
-        .then(response => {
-          console.log('Cost Data Response:', response.data); // Log the data
-
-          const formattedData = response.data.map((resourceData, index) => ({
-            id: index,
-            resourceGroupName: resourceData.resourceGroupName,
-            name: resourceData.name,
-            type: resourceData.type,
-            createdTime: resourceData.createdTime,
-            totalCost: parseFloat(resourceData.totalCost),
-            location: resourceData.location,
-            currency: resourceData.currency 
-          }));
-    
-          setCostGridData(formattedData);
-    
-          //const total = response.data.reduce((total, item) => total + parseFloat(item.cost), 0).toFixed(4);
-          const total = response.data.reduce((accumulator, item) => accumulator + parseFloat(item.totalCost), 0);
-          setTotalCost("£ " + total.toFixed(2)); // Ensure total is formatted correctly
-          setLoading(false);
-        })
-        .catch(error => {
-          setAlertInfo({ show: true, message: 'Failed to retrieve data for ' + selectedItems + '. Please retry after some time.', variant: 'danger' });
-          console.error('Error fetching grid data:', error);
-          setLoading(false);
-        });
-      } else {
-        axios.get('https://func-datalab-resource.azurewebsites.net/api/GetResourceAndResourceCostWithRetry?code=qD0tXBMsJtmG6BdVHihMXO7v-ADh_gY_LsUb0VJ66ThAAzFuXzcUgw==', {
-          params: {
-            startDate: startDate.toISOString().split('T')[0],
-            endDate: endDate.toISOString().split('T')[0],
-            resourceGroupNames: selectedRgForQuery, //selectedItems,
-            subscriptionId: selectedSubscription.value
-          }
-        })
-        .then(response => {
-          console.log('Resource Data Response:', response.data); // Log the data
-          const formattedData = response.data.map((resourceData, index) => ({
-            id: index,
-            resourceGroupName: resourceData.resourceGroupName,
-            name: resourceData.name,
-            type: resourceData.type,
-            createdTime: resourceData.createdTime,
-            totalCost: parseFloat(resourceData.totalCost),
-            location: resourceData.location,
-            resourceId:resourceData.id
-          }));
-    
-          setGridData(formattedData);
-          const total = response.data.reduce((accumulator, item) => accumulator + parseFloat(item.totalCost), 0);
-          setTotalCost("£ " + total.toFixed(2)); // Ensure total is formatted correctly
-          setLoading(false);
-        })
-        .catch(error => {
-          setAlertInfo({ show: true, message: 'Failed to retrieve data for ' + selectedItems + '. Please retry after some time.', variant: 'danger' });
-          console.error('Error fetching grid data:', error);
-          setLoading(false);
-        });
-      }
-
-    });  
+      });
 
   };
-  
+
   const handleToggleChange = (event) => {
     setShowAlternate(event.target.checked);
     setGridData([]);
@@ -340,14 +337,14 @@ const App = () => {
   };
   const handleCloseModal = () => {
     setUniqueModalShow(false);
-    setRefreshKey(prevKey => prevKey + 1); 
+    setRefreshKey(prevKey => prevKey + 1);
   };
 
   const handleCloseAlert = () => {
     setAlertInfo({ ...alertInfo, show: false });
   };
-  
- const costColumns = [
+
+  const costColumns = [
     { field: 'resourceGroupName', headerName: 'RG Name', width: 250 },
     { field: 'name', headerName: 'Service Name', width: 350 },
     { field: 'type', headerName: 'Service Type', width: 300 },
@@ -372,7 +369,7 @@ const App = () => {
   };
 
   return (
-   <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', padding: '10px', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', padding: '10px', overflow: 'hidden' }}>
 
       <AlertMessage
         show={alertInfo.show}
@@ -385,82 +382,91 @@ const App = () => {
       <div className="row text-center my-2" style={{ color: "royalblue" }}>
         <h4>e-Science Resource Data</h4>
       </div>
-          <div className="row bg-light" style={{ padding: '5px', borderRadius: '4px' }}>
-            <div className="col-8 col-md-8">
-                <div className="row">
-                  <div className="col-6 col-md-4">
-                  <label htmlFor="startDate"><h6>Start Date:</h6></label>
-                      <DatePicker
-                        selected={startDate}
-                        onChange={date => setStartDate(date)}
-                        dateFormat="yyyy-MM-dd"
-                        className="form-control form-control-sm"
-                      />
-            </div>
+      <div className="row bg-light" style={{ padding: '5px', borderRadius: '4px' }}>
+        <div className="col-8 col-md-8">
+          <div className="row">
             <div className="col-6 col-md-4">
-              <label htmlFor="endDate"><h6>End Date:</h6></label>
-              <DatePicker
-                selected={endDate}
-                onChange={date => setEndDate(date)}
-                dateFormat="yyyy-MM-dd"
-                className="form-control form-control-sm"
-              />
-            </div>
-            <div className="col-8 col-md-4"> 
-                  <FormControlLabel
-                      control={<Switch checked={showAlternate} onChange={handleToggleChange} />}
-                      label="Toggle Cost View"
-                    />
-                  </div>
-                </div>
-                {/* <div class="row">
-                  <div class="col-6">.col-6</div>
-                  <div class="col-6">.col-6</div>
-                </div> */}
-            </div>
-            <div className="col-4 col-md-4" >
+
               <div className="row">
-                <div className="col-4 col-md-2" >
-                    <label htmlFor="totalCost"><h6>Total:</h6></label>                    
+                <div className="col-6 col-md-6">
+                  <label htmlFor="startDate"><h6>Start Date:</h6></label>
                 </div>
-                <div className="col-8 col-md-6 " >
-                    <div className="bg-info text-white text-center" style={{ height: '5vh',  borderRadius: '4px' }}>
-                      <h6>{totalCost}</h6>
-                    </div>  
+                <div className="col-6 col-md-6 align-items-left">
+
+                  <input
+                    type="date"
+                    placeholder="Start Date"
+                    value={startDate ? startDate.toISOString().split('T')[0] : ''}
+                    onChange={e => setStartDate(e.target.value ? new Date(e.target.value) : null)}
+                    className="form-control form-control-sm"
+                  />
                 </div>
               </div>
             </div>
-          </div>
-          {/* Search List */}
-
-
-     <div className="row bg-light align-items-end" style={{ padding: '5px', borderRadius: '4px' }}>
-            <div className="col-8 col-md-8">                 
-                <div className="row">  
-                  <div className="col-2 col-md-4">   
-                        <label htmlFor="selectSubs"><h6>Select Subscription:</h6></label>
-                      </div>  
-                      <div className="col-10 col-md-8">
-                          <Select
-                            className="form-control-sm"
-                            id="selectSubs"                            
-                            options={subscription}
-                            value={selectedSubscription}
-                            onChange={handleSubscriptonSelectChange}
-                           
-                            styles={{
-                              control: (provided) => ({ ...provided, maxHeight: '40px', overflowY: 'auto' }),
-                              menu: (provided) => ({ ...provided, maxHeight: '200px', overflowY: 'auto' })
-                            }}
-                          />
-                  </div>
+            <div className="col-6 col-md-4">
+              <div className="row">
+                <div className="col-6 col-md-6">
+                  <label htmlFor="endDate"><h6>End Date:</h6></label>
                 </div>
+                <div className="col-6 col-md-6 align-items-left">
+                  <input
+                    type="date"
+                    placeholder="End Date"
+                    value={endDate ? endDate.toISOString().split('T')[0] : ''}
+                    onChange={e => setEndDate(e.target.value ? new Date(e.target.value) : null)}
+                    className="form-control form-control-sm"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="col-8 col-md-4">
+              <FormControlLabel
+                control={<Switch checked={showAlternate} onChange={handleToggleChange} />}
+                label="Toggle Cost View"
+              />
+            </div>
+          </div>
+        </div>
+        <div className="col-4 col-md-4" >
+          <div className="row">
+            <div className="col-6 col-md-6" >
+              <label htmlFor="totalCost"><h6>Total:</h6></label>
+            </div>
+            <div className="col-6 col-md-6" >
+              <div className="bg-info text-white text-center" style={{ height: '5vh', borderRadius: '4px' }}>
+                <h6>{totalCost}</h6>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="row bg-light align-items-end" style={{ padding: '5px', borderRadius: '4px' }}>
+        <div className="col-8 col-md-8">
+          <div className="row">
+            <div className="col-2 col-md-4">
+              <label htmlFor="selectSubs"><h6>Select Subscription:</h6></label>
+            </div>
+            <div className="col-10 col-md-8">
+              <Select
+                className="form-control-sm"
+                id="selectSubs"
+                options={subscription}
+                value={selectedSubscription}
+                onChange={handleSubscriptonSelectChange}
+
+                styles={{
+                  control: (provided) => ({ ...provided, maxHeight: '40px', overflowY: 'auto' }),
+                  menu: (provided) => ({ ...provided, maxHeight: '200px', overflowY: 'auto' })
+                }}
+              />
+            </div>
+          </div>
           <div className="row">
             <div className="col-2 col-md-2">
               <label htmlFor="selectItems"><h6>Select Items:</h6></label>
             </div>
             <div className="col-10 col-md-10">
-            <Select
+              <Select
                 className="form-control-sm"
                 id="selectItems"
                 isMulti
@@ -492,20 +498,20 @@ const App = () => {
           </div>
         ) : showAlternate ? (
           <DataGrid
-          rows={costGridData}
-          columns={costColumns}
-          pageSize={10}
-          className="data-grid-custom table"
-          rowsPerPageOptions={[10]}
-        />
+            rows={costGridData}
+            columns={costColumns}
+            pageSize={10}
+            className="data-grid-custom table"
+            rowsPerPageOptions={[10]}
+          />
         ) : (
           <DataGrid
-          rows={gridData}
-          columns={resourceColumns}
-          pageSize={10}
-          className="data-grid-custom table"
-          rowsPerPageOptions={[10]}
-        />
+            rows={gridData}
+            columns={resourceColumns}
+            pageSize={10}
+            className="data-grid-custom table"
+            rowsPerPageOptions={[10]}
+          />
         )}
       </div>
 
@@ -515,18 +521,16 @@ const App = () => {
 
       {/* Render UniqueFilterModal */}
       {uniqueModalShow && (
-         <UniqueFilterModal
-         show={uniqueModalShow}
-         onHide={handleCloseModal}
-         startDate={startDate}
-         endDate={endDate}
-         ResourceGroupsData={resourceGroups} 
-         onSaveFilter={handleSaveFilter} 
-         onDeleteFilter={handleDeleteFilter}
-       />
+        <UniqueFilterModal
+          show={uniqueModalShow}
+          onHide={handleCloseModal}
+          startDate={startDate}
+          endDate={endDate}
+          ResourceGroupsData={resourceGroups}
+          onSaveFilter={handleSaveFilter}
+          onDeleteFilter={handleDeleteFilter}
+        />
       )}
-     
-
     </div>
   );
 };
