@@ -309,7 +309,8 @@ const App = () => {
                 createdTime: resourceData.createdTime,
                 totalCost: parseFloat(resourceData.totalCost),
                 location: resourceData.location,
-                currency: resourceData.currency
+                currency: resourceData.currency,
+                resourceId: resourceData.id
               }));
 
               setCostGridData(formattedData);
@@ -357,7 +358,8 @@ const App = () => {
     { field: 'type', headerName: 'Service Type', width: 300 },
     { field: 'location', headerName: 'Location', width: 200 },
     { field: 'createdTime', headerName: 'Created Time', width: 250 },
-    { field: 'totalCost', headerName: 'Cost', width: 500 }
+    { field: 'totalCost', headerName: 'Cost', width: 250 },
+    { field: 'resourceId', headerName: 'Resource Id', width: 500 }
   ];
 
   const resourceColumns = [
