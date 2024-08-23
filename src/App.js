@@ -70,10 +70,12 @@ const App = () => {
           setFilterItems(filterOptions);
 
           // Set date range
-          const oldestDate = ResourceGroupsData[0].ResourceGroups[0].OldestResourceinResourceGroup;
-          const newestDate = ResourceGroupsData[0].ResourceGroups[0].NewestResourceinResourceGroup;
-          setStartDate(new Date(oldestDate));
-          setEndDate(new Date());
+          // const oldestDate = ResourceGroupsData[0].ResourceGroups[0].OldestResourceinResourceGroup;
+          // const newestDate = ResourceGroupsData[0].ResourceGroups[0].NewestResourceinResourceGroup;
+          let date = new Date();
+
+          setStartDate(new Date(date.getFullYear(), 0, 2))
+          setEndDate(date);
         })
         .catch(error => console.error('Error fetching data:', error));
     }
@@ -248,10 +250,46 @@ const App = () => {
         } else {
           selectedRgForQuery = selectedItems;
         }
-        //####################################  Grid Data
+
         setLoading(true);
 
         if (showAlternate) {
+
+          axios.get('https://func-datalab-resource.azurewebsites.net/api/GetResourceAndResourceCostWithRetry?code=qD0tXBMsJtmG6BdVHihMXO7v-ADh_gY_LsUb0VJ66ThAAzFuXzcUgw==', {
+            params: {
+              startDate: startDate.toISOString().split('T')[0],
+              endDate: endDate.toISOString().split('T')[0],
+              resourceGroupNames: selectedRgForQuery, //selectedItems,
+              subscriptionId: selectedSubscription.value
+            }
+          })
+            .then(response => {
+              console.log('Resource Data Response:', response.data); // Log the data
+              const formattedData = response.data.map((resourceData, index) => ({
+                id: index,
+                resourceGroupName: resourceData.resourceGroupName,
+                name: resourceData.name,
+                type: resourceData.type,
+                createdTime: resourceData.createdTime,
+                totalCost: parseFloat(resourceData.totalCost),
+                location: resourceData.location,
+                resourceId: resourceData.id
+              }));
+
+              setGridData(formattedData);
+              const total = response.data.reduce((accumulator, item) => accumulator + parseFloat(item.totalCost), 0);
+              setTotalCost("£ " + total.toFixed(2)); // Ensure total is formatted correctly
+              setLoading(false);
+            })
+            .catch(error => {
+              setAlertInfo({ show: true, message: 'Failed to retrieve data for ' + selectedItems + '. Please retry after some time.', variant: 'danger' });
+              console.error('Error fetching grid data:', error);
+              setLoading(false);
+            });
+
+
+        } else {
+
           axios.get('https://func-datalab-resource.azurewebsites.net/api/GetCostDataWithRetry?code=qD0tXBMsJtmG6BdVHihMXO7v-ADh_gY_LsUb0VJ66ThAAzFuXzcUgw==', {
             params: {
               startDate: startDate.toISOString().split('T')[0],
@@ -286,38 +324,7 @@ const App = () => {
               console.error('Error fetching grid data:', error);
               setLoading(false);
             });
-        } else {
-          axios.get('https://func-datalab-resource.azurewebsites.net/api/GetResourceAndResourceCostWithRetry?code=qD0tXBMsJtmG6BdVHihMXO7v-ADh_gY_LsUb0VJ66ThAAzFuXzcUgw==', {
-            params: {
-              startDate: startDate.toISOString().split('T')[0],
-              endDate: endDate.toISOString().split('T')[0],
-              resourceGroupNames: selectedRgForQuery, //selectedItems,
-              subscriptionId: selectedSubscription.value
-            }
-          })
-            .then(response => {
-              console.log('Resource Data Response:', response.data); // Log the data
-              const formattedData = response.data.map((resourceData, index) => ({
-                id: index,
-                resourceGroupName: resourceData.resourceGroupName,
-                name: resourceData.name,
-                type: resourceData.type,
-                createdTime: resourceData.createdTime,
-                totalCost: parseFloat(resourceData.totalCost),
-                location: resourceData.location,
-                resourceId: resourceData.id
-              }));
 
-              setGridData(formattedData);
-              const total = response.data.reduce((accumulator, item) => accumulator + parseFloat(item.totalCost), 0);
-              setTotalCost("£ " + total.toFixed(2)); // Ensure total is formatted correctly
-              setLoading(false);
-            })
-            .catch(error => {
-              setAlertInfo({ show: true, message: 'Failed to retrieve data for ' + selectedItems + '. Please retry after some time.', variant: 'danger' });
-              console.error('Error fetching grid data:', error);
-              setLoading(false);
-            });
         }
 
       });
@@ -380,7 +387,7 @@ const App = () => {
 
       <img src={logoTopLeft} alt="Logo" style={{ position: 'absolute', top: '10px', left: '10px', width: '60px', height: 'auto', zIndex: '100' }} />
       <div className="row text-center my-2" style={{ color: "royalblue" }}>
-        <h4>e-Science Resource Data</h4>
+        <h4>R & D Azure Resource Data</h4>
       </div>
       <div className="row bg-light" style={{ padding: '5px', borderRadius: '4px' }}>
         <div className="col-8 col-md-8">
@@ -422,7 +429,7 @@ const App = () => {
             <div className="col-8 col-md-4">
               <FormControlLabel
                 control={<Switch checked={showAlternate} onChange={handleToggleChange} />}
-                label="Toggle Cost View"
+                label="Resource View"
               />
             </div>
           </div>
@@ -498,20 +505,20 @@ const App = () => {
           </div>
         ) : showAlternate ? (
           <DataGrid
-            rows={costGridData}
-            columns={costColumns}
-            pageSize={10}
-            className="data-grid-custom table"
-            rowsPerPageOptions={[10]}
-          />
-        ) : (
-          <DataGrid
             rows={gridData}
             columns={resourceColumns}
             pageSize={10}
             className="data-grid-custom table"
             rowsPerPageOptions={[10]}
           />
+        ) : (
+          <DataGrid
+          rows={costGridData}
+          columns={costColumns}
+          pageSize={10}
+          className="data-grid-custom table"
+          rowsPerPageOptions={[10]}
+        />
         )}
       </div>
 
