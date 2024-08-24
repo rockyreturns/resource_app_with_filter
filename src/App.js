@@ -36,6 +36,7 @@ const App = () => {
   const [filterItems, setFilterItems] = useState({});
   const [resourceData, setResourceData] = useState({});
   const effectRan = useRef(false);
+  const [toggLelabelText, setLabelText] = useState('Cost View');
 
   const handleSaveFilter = (newFilter) => {
     setFilterChanged(true); // Trigger polling    
@@ -170,7 +171,6 @@ const App = () => {
             }));
 
           setOptions([
-            { value: 'select_all', label: 'Select All' },
             ...remainingFilters,
             ...remainingResourceGroups
           ]);
@@ -337,6 +337,7 @@ const App = () => {
     setGridData([]);
     setCostGridData([]);
     setTotalCost(0);
+    setLabelText(event.target.checked ? 'Resource View' : 'Cost View' );
   };
 
   const handleUniqueModalOpen = () => {
@@ -431,14 +432,14 @@ const App = () => {
             <div className="col-8 col-md-4">
               <FormControlLabel
                 control={<Switch checked={showAlternate} onChange={handleToggleChange} />}
-                label="Resource View"
+                label={toggLelabelText}
               />
             </div>
           </div>
         </div>
         <div className="col-4 col-md-4" >
           <div className="row">
-            <div className="col-6 col-md-6" >
+            <div className="col-6 col-md-6 text-md-end" >
               <label htmlFor="totalCost"><h6>Total:</h6></label>
             </div>
             <div className="col-6 col-md-6" >
